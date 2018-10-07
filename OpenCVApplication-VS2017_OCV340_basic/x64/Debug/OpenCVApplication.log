@@ -1,0 +1,8 @@
+﻿  OpenCVApplication.cpp
+c:\users\nlill\downloads\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(458): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+c:\users\nlill\downloads\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(459): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+c:\users\nlill\downloads\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(460): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+  OpenCVApplication.vcxproj -> C:\Users\nlill\Downloads\OpenCVApplication-VS2017_OCV340_basic\x64\Debug\OpenCVApplication.exe
+  OpenCV\dll\Debug\opencv_ffmpeg340_64.dll
+  OpenCV\dll\Debug\opencv_world340d.dll
+          2 file(s) copied.
