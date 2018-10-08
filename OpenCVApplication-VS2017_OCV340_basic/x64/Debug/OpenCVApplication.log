@@ -1,10 +1,14 @@
-﻿  stdafx.cpp
-  OpenCVApplication.cpp
-c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(458): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(459): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(460): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-  common.cpp
-  Generating Code...
+﻿  OpenCVApplication.cpp
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(470): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(471): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(472): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(490): warning C4244: 'initializing': conversion from 'unsigned __int64' to 'float', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(507): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(508): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(509): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(511): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(512): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(513): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
   OpenCVApplication.vcxproj -> C:\Users\Lilla\Documents\Visual Studio 2015\Projects\PRS\OpenCVApplication-VS2017_OCV340_basic\x64\Debug\OpenCVApplication.exe
   OpenCVApplication.vcxproj -> C:\Users\Lilla\Documents\Visual Studio 2015\Projects\PRS\OpenCVApplication-VS2017_OCV340_basic\x64\Debug\OpenCVApplication.pdb (Full PDB)
   OpenCV\dll\Debug\opencv_ffmpeg340_64.dll

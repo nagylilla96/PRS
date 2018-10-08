@@ -3,11 +3,13 @@
 
 #include "stdafx.h"
 #include "common.h"
+#include <iostream>
+#include <vector>
 
-std::list<float> xCoord;
-std::list<float> yCoord;
 Mat img(500, 500, CV_8UC3);
-
+std::vector<Point2f> points;
+float xmin = 9999, ymin = 9999, xmax = 0, ymax = 0;
+float sumax = 0, sumay = 0, sumaxx = 0, sumayy_xx = 0, sumaxy = 0;
 
 void testOpenImage()
 {
@@ -79,7 +81,6 @@ void testNegativeImage()
 	while(openFileDlg(fname))
 	{
 		double t = (double)getTickCount(); // Get the current time [s]
-		
 		Mat src = imread(fname,CV_LOAD_IMAGE_GRAYSCALE);
 		int height = src.rows;
 		int width = src.cols;
@@ -165,7 +166,6 @@ void testColor2Gray()
 				dst.at<uchar>(i,j) = (r+g+b)/3;
 			}
 		}
-		
 		imshow("input image",src);
 		imshow("gray image",dst);
 		waitKey();
@@ -265,7 +265,6 @@ void testVideoSequence()
 		waitKey(0);
 		return;
 	}
-		
 	Mat edges;
 	Mat frame;
 	char c;
@@ -300,7 +299,6 @@ void testSnap()
 	Mat frame;
 	char numberStr[256];
 	char fileName[256];
-	
 	// video resolution
 	Size capS = Size((int)cap.get(CV_CAP_PROP_FRAME_WIDTH),
 		(int)cap.get(CV_CAP_PROP_FRAME_HEIGHT));
@@ -328,7 +326,6 @@ void testSnap()
 		}
 
 		++frameNum;
-		
 		imshow(WIN_SRC, frame);
 
 c = cvWaitKey(10);  // waits a key press to advance to the next frame
@@ -426,15 +423,34 @@ void showHistogram(const std::string& name, int* hist, const int  hist_cols, con
 void readPoints()
 {
 	char fname[MAX_PATH];
-
+	int nr;
 	float x, y;
 	openFileDlg(fname);
 	FILE* f = fopen(fname, "r");
 
-	while (fscanf(f, "%f%f", &x, &y) != EOF)
+	fscanf(f, "%i", &nr);
+
+	for (int i = 0; i < nr; i++)
 	{
-		xCoord.push_back(x);
-		yCoord.push_back(y);
+		Point2f point;
+		fscanf(f, "%f%f", &x, &y);
+		sumax += x;
+		sumay += y;
+		sumaxy += x * y;
+		sumaxx += x * x;
+		sumayy_xx += y * y - x * x;
+		if (x < xmin) xmin = x;
+		if (y < ymin) ymin = y;
+		if (x > xmax) xmax = x;
+		if (y > ymax) ymax = y;
+		point.x = (float) x;
+		point.y = (float) y;
+		points.push_back(point);
+	}
+	for (int i = 0; i < nr; i++)
+	{
+		points[i].x -= xmin;
+		points[i].y -= ymin;
 	}
 	fclose(f);
 }
@@ -442,62 +458,62 @@ void readPoints()
 void testReadPoints() {
 	std::list<float>::iterator itx, ity;
 	std::cout << "The coordinates are: " << std::endl;
-	for (itx = xCoord.begin(), ity = yCoord.begin(); itx != xCoord.end(), ity != yCoord.end(); itx++, ity++)
+	for (Point2f p: points)
 	{
-		std::cout << "(" << *itx << ", " << *ity << ")" << std::endl;
+		std::cout << "(" << p.x << ", " << p.y << ")" << std::endl;
 	}
 }
 
 void displayPoints() {
-	std::list<float>::iterator itx, ity;
 	std::cout << "The coordinates are: " << std::endl;
-	for (itx = xCoord.begin(), ity = yCoord.begin(); itx != xCoord.end(), ity != yCoord.end(); itx++, ity++)
-	{
-		if (*itx > 0 && *ity > 0)
-		{
-			img.at<Vec3b>(*itx, *ity)[0] = 0;
-			img.at<Vec3b>(*itx, *ity)[1] = 0;
-			img.at<Vec3b>(*itx, *ity)[2] = 0;
-		}
+	for (Point2f p: points) {
+			img.at<Vec3b>(p.y, p.x)[0] = 0;
+			img.at<Vec3b>(p.y, p.x)[1] = 0;
+			img.at<Vec3b>(p.y, p.x)[2] = 0;
 	}
 }
 
 float calculateO1() {
-	std::list<float>::iterator itx, ity;
-	float suma1 = 0, suma2 = 0, suma3 = 0, suma4 = 0, suma5 = 0, O1 = 0;
-	for (itx = xCoord.begin(), ity = yCoord.begin(); itx != xCoord.end(), ity != yCoord.end(); itx++, ity++)
-	{
-		suma1 += *itx * *ity;
-		suma2 += *itx;
-		suma3 += *ity;
-		suma4 += *itx * *itx;
-		suma5 += *itx;
-	}
-	O1 = (xCoord.size() * suma1 - (suma2 * suma3)) / (xCoord.size() * suma4 - (suma5 * suma5));
-	std::cout << "O1 = " << O1 << std::endl;
-	waitKey();
+	float O1 = 0;
+	O1 = points.size() * sumaxy - sumax * sumay;
+	O1 /= points.size() * sumaxx - sumax * sumax;
 	return O1;
 }
 
 float calculateO0() {
-	std::list<float>::iterator itx, ity;
-	float suma1 = 0, suma2 = 0, O0 = 0;
-	for (itx = xCoord.begin(), ity = yCoord.begin(); itx != xCoord.end(), ity != yCoord.end(); itx++, ity++)
-	{
-		suma1 += *ity;
-		suma2 += *itx;
-	}
-	O0 = (1 / xCoord.size()) * (suma1 - calculateO1() * suma2);
-	std::cout << "O0 = " << O0 << std::endl;
-	getchar();
-	waitKey();
+	float O0 = 0, O1 = calculateO1();
+	O0 = (sumay - O1 * sumax) / points.size();
 	return O0;
 }
 
+float calculateBeta() {
+	float beta = 0, par1 = 0, par2 = 0, n = points.size();
+	par1 = 2 * sumaxy - 2 * sumax * sumay / n;
+	par2 = sumayy_xx + sumax * sumax / n - sumay * sumay / n;
+	beta = -atan2(par1, par2) / 2;
+	return beta;
+}
+
+float calculateRo() {
+	float ro = 0, beta = calculateBeta();
+	ro = (cos(beta) * sumax + sin(beta) * sumay) / points.size();
+	return ro;
+}
+
 void drawWhiteImage() {
-	for (int i = 0; i < 500; i++) 
+	float O0 = calculateO0(), O1 = calculateO1(), ro = calculateRo(), beta = calculateBeta();
+	Point p1, p2, p3, p4;
+	p1.x = 0;
+	p1.y = O0;
+	p2.x = xmax;
+	p2.y = p1.y + xmax * O1;
+	p3.x = 0;
+	p3.y = ro / sin(beta);
+	p4.x = xmax;
+	p4.y = (ro - xmax * cos(beta)) / sin(beta);
+	for (int i = 0; i < 500; i++)
 	{
-		for (int j = 0; j < 500; j++) 
+		for (int j = 0; j < 500; j++)
 		{
 			img.at<Vec3b>(i, j)[0] = 255; //blue
 			img.at<Vec3b>(i, j)[1] = 255; //green
@@ -505,7 +521,8 @@ void drawWhiteImage() {
 		}
 	}
 	displayPoints();
-	//line(img, Point(x1, y1), Point(x2, y2), Scalar(B, G, R));
+	line(img, p1, p2, Scalar(255, 255, 0), 5);
+	line(img, p3, p4, Scalar(0, 0, 0));
 	imshow("white", img);
 	waitKey();
 }
@@ -527,7 +544,7 @@ int main()
 		printf(" 7 - Edges in a video sequence\n");
 		printf(" 8 - Snap frame from live video\n");
 		printf(" 9 - Mouse callback demo\n");
-		printf(" 10 - Lab1\n");
+		printf(" 10 - Least Mean Squares\n");
 		printf(" 0 - Exit\n\n");
 		printf("Option: ");
 		scanf("%d",&op);
@@ -561,12 +578,11 @@ int main()
 			case 9:
 				testMouseClick();
 				break;
-			case 10: 
+			case 10:
 				readPoints();
 				drawWhiteImage();
-				//std::cout << calculateO1() << std::endl;
-				//std::cout << calculateO0() << std::endl;
-				//getchar();
+				break;
+			default:
 				break;
 		}
 	}
