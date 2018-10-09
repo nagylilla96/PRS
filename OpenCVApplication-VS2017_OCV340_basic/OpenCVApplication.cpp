@@ -434,11 +434,7 @@ void readPoints()
 	{
 		Point2f point;
 		fscanf(f, "%f%f", &x, &y);
-		sumax += x;
-		sumay += y;
-		sumaxy += x * y;
-		sumaxx += x * x;
-		sumayy_xx += y * y - x * x;
+		
 		if (x < xmin) xmin = x;
 		if (y < ymin) ymin = y;
 		if (x > xmax) xmax = x;
@@ -451,6 +447,11 @@ void readPoints()
 	{
 		points[i].x -= xmin;
 		points[i].y -= ymin;
+		sumax += points[i].x;
+		sumay += points[i].y;
+		sumaxy += points[i].x * points[i].y;
+		sumaxx += points[i].x * points[i].x;
+		sumayy_xx += points[i].y * points[i].y - points[i].x * points[i].x;
 	}
 	fclose(f);
 }
@@ -475,28 +476,28 @@ void displayPoints() {
 
 float calculateO1() {
 	float O1 = 0;
-	O1 = points.size() * sumaxy - sumax * sumay;
-	O1 /= points.size() * sumaxx - sumax * sumax;
+	O1 = (float) (points.size() * sumaxy - sumax * sumay);
+	O1 /= (float) (points.size() * sumaxx - sumax * sumax);
 	return O1;
 }
 
 float calculateO0() {
 	float O0 = 0, O1 = calculateO1();
-	O0 = (sumay - O1 * sumax) / points.size();
+	O0 = (float) (sumay - O1 * sumax) / (float) points.size();
 	return O0;
 }
 
 float calculateBeta() {
 	float beta = 0, par1 = 0, par2 = 0, n = points.size();
-	par1 = 2 * sumaxy - 2 * sumax * sumay / n;
-	par2 = sumayy_xx + sumax * sumax / n - sumay * sumay / n;
-	beta = -atan2(par1, par2) / 2;
+	par1 = (float) (2 * sumaxy - 2.0 * sumax * sumay / n);
+	par2 = sumayy_xx + sumax * sumax /  (float) n - sumay * sumay / (float) n;
+	beta = -0.5 * atan2(par1, par2);
 	return beta;
 }
 
 float calculateRo() {
 	float ro = 0, beta = calculateBeta();
-	ro = (cos(beta) * sumax + sin(beta) * sumay) / points.size();
+	ro = (cos(beta) * sumax + sin(beta) * sumay) / (float) points.size();
 	return ro;
 }
 
@@ -505,12 +506,12 @@ void drawWhiteImage() {
 	Point p1, p2, p3, p4;
 	p1.x = 0;
 	p1.y = O0;
-	p2.x = xmax;
-	p2.y = p1.y + xmax * O1;
+	p2.x = xmax - xmin;
+	p2.y = p1.y + p2.x * O1;
 	p3.x = 0;
 	p3.y = ro / sin(beta);
-	p4.x = xmax;
-	p4.y = (ro - xmax * cos(beta)) / sin(beta);
+	p4.x = p2.x;
+	p4.y = (ro - p2.x * cos(beta)) / sin(beta);
 	for (int i = 0; i < 500; i++)
 	{
 		for (int j = 0; j < 500; j++)
