@@ -6,11 +6,6 @@
 #include <iostream>
 #include <vector>
 
-Mat img(500, 500, CV_8UC3);
-std::vector<Point2f> points;
-float xmin = 9999, ymin = 9999, xmax = 0, ymax = 0;
-float sumax = 0, sumay = 0, sumaxx = 0, sumayy_xx = 0, sumaxy = 0;
-
 void testOpenImage()
 {
 	char fname[MAX_PATH];
@@ -420,31 +415,124 @@ void showHistogram(const std::string& name, int* hist, const int  hist_cols, con
 	imshow(name, imgHist);
 }
 
-void readPoints()
+// Display the points on the image
+void displayPoints(Mat img, std::vector<Point2f> points) {
+	for (Point2f p : points) {
+		img.at<Vec3b>(p.y, p.x)[0] = 0;
+		img.at<Vec3b>(p.y, p.x)[1] = 0;
+		img.at<Vec3b>(p.y, p.x)[2] = 0;
+	}
+}
+
+/*
+	Calculate theta 1
+	n - number of points
+*/
+float calculateO1(int n, float sumax, float sumay, float sumaxx, float sumaxy) {
+	float O1 = 0;
+	O1 = (float) (n * sumaxy - sumax * sumay);
+	O1 /= (float) (n * sumaxx - sumax * sumax);
+	return O1;
+}
+
+/*
+Calculate theta 0
+n - number of points
+*/
+float calculateO0(int n, float O1, float sumax, float sumay) {
+	float O0 = 0;
+	O0 = (float) (sumay - O1 * sumax) / (float) n;
+	return O0;
+}
+
+/*
+Calculate beta
+n - number of points
+*/
+float calculateBeta(int n, float sumax, float sumay, float sumaxx, float sumaxy, float sumayy_xx) {
+	float beta = 0, par1 = 0, par2 = 0;
+	par1 = (float) (2 * sumaxy - 2.0 * sumax * sumay / n);
+	par2 = sumayy_xx + sumax * sumax /  (float) n - sumay * sumay / (float) n;
+	beta = -0.5 * atan2(par1, par2);
+	return beta;
+}
+
+/*
+Calculate ro
+n - number of points
+*/
+float calculateRo(int n, float beta, float sumax, float sumay) {
+	float ro = 0;
+	ro = (cos(beta) * sumax + sin(beta) * sumay) / (float) n;
+	return ro;
+}
+
+/*
+	Display the image
+*/
+void drawImage(Mat img, std::vector<Point2f> points, float width, float O0, float O1, float beta, float ro) {
+	// Define the points
+	Point p1 = Point(0, O0);
+	Point p2 = Point(width, O0 + width * O1);
+	Point p3 = Point(0, ro / sin(beta));
+	Point p4 = Point(width, (ro - width * cos(beta)) / sin(beta));
+
+	for (int i = 0; i < 500; i++)
+	{
+		for (int j = 0; j < 500; j++)
+		{
+			// Display an 500x500 white image
+			img.at<Vec3b>(i, j)[0] = 255; //blue
+			img.at<Vec3b>(i, j)[1] = 255; //green
+			img.at<Vec3b>(i, j)[2] = 255; //red
+		}
+	}
+
+	// Display the points over the image
+	displayPoints(img, points);
+
+	// Draw lines
+	line(img, p1, p2, Scalar(255, 255, 0), 5);
+	line(img, p3, p4, Scalar(0, 0, 0));
+
+	imshow("LeastMeanSquares", img);
+	waitKey();
+}
+
+void leastMeanSquares()
 {
+	Mat img(500, 500, CV_8UC3);
+	std::vector<Point2f> points;
+	float xmin = 9999, ymin = 9999, xmax = 0, ymax = 0, ro = 0, O0 = 0, O1 = 0, beta = 0;
+	float sumax = 0, sumay = 0, sumaxx = 0, sumayy_xx = 0, sumaxy = 0;
 	char fname[MAX_PATH];
 	int nr;
-	float x, y;
+
+	// Open file
 	openFileDlg(fname);
 	FILE* f = fopen(fname, "r");
 
+	// Scan the number of (x, y) pairs
 	fscanf(f, "%i", &nr);
 
 	for (int i = 0; i < nr; i++)
 	{
+		// Read each (x, y) pair, add them to the vector and calculate all mins and maxs
 		Point2f point;
+		float x, y;
 		fscanf(f, "%f%f", &x, &y);
-		
 		if (x < xmin) xmin = x;
 		if (y < ymin) ymin = y;
 		if (x > xmax) xmax = x;
 		if (y > ymax) ymax = y;
-		point.x = (float) x;
-		point.y = (float) y;
+		point.x = (float)x;
+		point.y = (float)y;
 		points.push_back(point);
 	}
+
 	for (int i = 0; i < nr; i++)
 	{
+		// Normalize points and calculate sums
 		points[i].x -= xmin;
 		points[i].y -= ymin;
 		sumax += points[i].x;
@@ -453,79 +541,17 @@ void readPoints()
 		sumaxx += points[i].x * points[i].x;
 		sumayy_xx += points[i].y * points[i].y - points[i].x * points[i].x;
 	}
+
+	// Close file
 	fclose(f);
-}
 
-void testReadPoints() {
-	std::list<float>::iterator itx, ity;
-	std::cout << "The coordinates are: " << std::endl;
-	for (Point2f p: points)
-	{
-		std::cout << "(" << p.x << ", " << p.y << ")" << std::endl;
-	}
-}
+	// Calculate necessary parameters
+	O1 = calculateO1(nr, sumax, sumay, sumaxx, sumaxy);
+	O0 = calculateO0(nr, O1, sumax, sumay);
+	beta = calculateBeta(nr, sumax, sumay, sumaxx, sumaxy, sumayy_xx);
+	ro = calculateRo(nr, beta, sumax, sumay);
 
-void displayPoints() {
-	std::cout << "The coordinates are: " << std::endl;
-	for (Point2f p: points) {
-			img.at<Vec3b>(p.y, p.x)[0] = 0;
-			img.at<Vec3b>(p.y, p.x)[1] = 0;
-			img.at<Vec3b>(p.y, p.x)[2] = 0;
-	}
-}
-
-float calculateO1() {
-	float O1 = 0;
-	O1 = (float) (points.size() * sumaxy - sumax * sumay);
-	O1 /= (float) (points.size() * sumaxx - sumax * sumax);
-	return O1;
-}
-
-float calculateO0() {
-	float O0 = 0, O1 = calculateO1();
-	O0 = (float) (sumay - O1 * sumax) / (float) points.size();
-	return O0;
-}
-
-float calculateBeta() {
-	float beta = 0, par1 = 0, par2 = 0, n = points.size();
-	par1 = (float) (2 * sumaxy - 2.0 * sumax * sumay / n);
-	par2 = sumayy_xx + sumax * sumax /  (float) n - sumay * sumay / (float) n;
-	beta = -0.5 * atan2(par1, par2);
-	return beta;
-}
-
-float calculateRo() {
-	float ro = 0, beta = calculateBeta();
-	ro = (cos(beta) * sumax + sin(beta) * sumay) / (float) points.size();
-	return ro;
-}
-
-void drawWhiteImage() {
-	float O0 = calculateO0(), O1 = calculateO1(), ro = calculateRo(), beta = calculateBeta();
-	Point p1, p2, p3, p4;
-	p1.x = 0;
-	p1.y = O0;
-	p2.x = xmax - xmin;
-	p2.y = p1.y + p2.x * O1;
-	p3.x = 0;
-	p3.y = ro / sin(beta);
-	p4.x = p2.x;
-	p4.y = (ro - p2.x * cos(beta)) / sin(beta);
-	for (int i = 0; i < 500; i++)
-	{
-		for (int j = 0; j < 500; j++)
-		{
-			img.at<Vec3b>(i, j)[0] = 255; //blue
-			img.at<Vec3b>(i, j)[1] = 255; //green
-			img.at<Vec3b>(i, j)[2] = 255; //red
-		}
-	}
-	displayPoints();
-	line(img, p1, p2, Scalar(255, 255, 0), 5);
-	line(img, p3, p4, Scalar(0, 0, 0));
-	imshow("white", img);
-	waitKey();
+	drawImage(img, points, xmax - xmin, O0, O1, beta, ro);
 }
 
 int main()
@@ -580,8 +606,7 @@ int main()
 				testMouseClick();
 				break;
 			case 10:
-				readPoints();
-				drawWhiteImage();
+				leastMeanSquares();
 				break;
 			default:
 				break;
