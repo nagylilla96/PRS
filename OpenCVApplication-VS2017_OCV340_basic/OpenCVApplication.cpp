@@ -554,6 +554,82 @@ void leastMeanSquares()
 	drawImage(img, points, xmax - xmin, O0, O1, beta, ro);
 }
 
+void ransac(int t, float p, float q, int s)
+{
+	std::vector<Point> points;
+	Point P1, P2;
+	int n = 0, rows, cols, A = 0, B = 0, C = 0, Skmax = 0;
+	float N = 0, T = 0;
+	char fname[MAX_PATH];
+
+	srand(time(NULL));
+
+	openFileDlg(fname);
+
+	Mat img = imread(fname,  CV_LOAD_IMAGE_GRAYSCALE);
+
+	rows = img.rows;
+	cols = img.cols;
+
+	for (int i = 0; i < rows; i++)
+	{
+		for (int j = 0; j < cols; j++)
+		{
+			if (img.at<uchar>(i, j) == 0)
+			{
+				points.push_back(Point(j, i));
+				n++;
+			}
+		}
+	}
+
+	N = (float) log(1 - p) / log(1 - pow(q, s));
+	T = q * n;
+
+	for (int i = 0; i < N; i++)
+	{
+		int i1, i2, Sk = 0, a, b, c;
+
+		i1 = rand() % n;
+		i2 = rand() % n;
+		while (i1 == i2)
+		{
+			i1 = rand() % n;
+			i2 = rand() % n;
+		}
+
+		Point p1 = Point(points[i1].x, points[i1].y);
+		Point p2 = Point(points[i2].x, points[i2].y);
+		a = p1.y - p2.y;
+		b = p2.x - p1.x;
+		c = p1.x * p2.y - p2.x * p1.y;
+
+		for (int j = 0; j < n; j++)
+		{
+			float dist = 0;
+			dist = (float) abs(a * points[j].x + b * points[j].y + c) / sqrt(a * a + b * b);
+			if (dist <= t) Sk++;
+		}
+
+		if (Sk >= Skmax)
+		{
+			A = a;
+			B = b;
+			C = c;
+			P1 = p1;
+			P2 = p2;
+			Skmax = Sk;
+		}
+
+		if (Sk >= T) break;
+	}
+
+	line(img, P1, P2, Scalar(0, 0, 0));
+
+	imshow("Ransac", img);
+	waitKey();
+}
+
 int main()
 {
 	int op;
@@ -572,6 +648,7 @@ int main()
 		printf(" 8 - Snap frame from live video\n");
 		printf(" 9 - Mouse callback demo\n");
 		printf(" 10 - Least Mean Squares\n");
+		printf(" 11 - RANSAC line\n");
 		printf(" 0 - Exit\n\n");
 		printf("Option: ");
 		scanf("%d",&op);
@@ -607,6 +684,9 @@ int main()
 				break;
 			case 10:
 				leastMeanSquares();
+				break;
+			case 11:
+				ransac(10, 0.99, 0.8, 2);
 				break;
 			default:
 				break;
