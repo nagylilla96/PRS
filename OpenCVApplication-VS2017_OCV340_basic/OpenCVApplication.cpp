@@ -6,6 +6,13 @@
 #include <iostream>
 #include <vector>
 
+struct peak {
+	int theta, ro, hval;
+	bool operator < (const peak& o) const {
+		return hval > o.hval;
+	}
+};
+
 void testOpenImage()
 {
 	char fname[MAX_PATH];
@@ -94,7 +101,7 @@ void testNegativeImage()
 
 		// Get the current time again and compute the time difference [s]
 		t = ((double)getTickCount() - t) / getTickFrequency();
-		// Print (in the console window) the processing time in [ms] 
+		// Print (in the console window) the processing time in [ms]
 		printf("Time = %.3f [ms]\n", t * 1000);
 
 		imshow("input image",src);
@@ -127,7 +134,7 @@ void testParcurgereSimplaDiblookStyle()
 
 		// Get the current time again and compute the time difference [s]
 		t = ((double)getTickCount() - t) / getTickFrequency();
-		// Print (in the console window) the processing time in [ms] 
+		// Print (in the console window) the processing time in [ms]
 		printf("Time = %.3f [ms]\n", t * 1000);
 
 		imshow("input image",src);
@@ -275,7 +282,7 @@ void testVideoSequence()
 		c = cvWaitKey(0);  // waits a key press to advance to the next frame
 		if (c == 27) {
 			// press ESC to exit
-			printf("ESC pressed - capture finished\n"); 
+			printf("ESC pressed - capture finished\n");
 			break;  //ESC pressed
 		};
 	}
@@ -365,7 +372,7 @@ void MyCallBackFunc(int event, int x, int y, int flags, void* param)
 void testMouseClick()
 {
 	Mat src;
-	// Read image from file 
+	// Read image from file
 	char fname[MAX_PATH];
 	while (openFileDlg(fname))
 	{
@@ -630,6 +637,109 @@ void ransac(int t, float p, float q, int s)
 	waitKey();
 }
 
+bool desc(peak i, peak j) { return i.hval > j.hval; }
+
+void hough()
+{
+	std::vector<Point> points;
+	std::vector<peak> peaks;
+	int rows, cols, n = 0, maxHough = 0;
+	double diag;
+	char fname[MAX_PATH];
+	Mat houghImg;
+
+	srand(time(NULL));
+
+	openFileDlg(fname);
+
+	Mat img = imread(fname, CV_LOAD_IMAGE_GRAYSCALE);
+	Mat colorImg = imread(fname);
+
+
+	rows = img.rows;
+	cols = img.cols;
+	diag = sqrt(rows * rows + cols * cols);
+	Mat Hough(360, diag + 1, CV_32SC1, Scalar(0));
+
+	for (int i = 0; i < rows; i++)
+	{
+		for (int j = 0; j < cols; j++)
+		{
+			if (img.at<uchar>(i, j) == 255)
+			{
+				points.push_back(Point(j, i));
+				n++;
+			}
+		}
+	}
+
+	for (int i = 0; i < n; i++)
+	{
+		for (int theta = 0; theta < 360; theta++)
+		{
+				int ro = points[i].x * cos((theta * CV_PI) / 180) + points[i].y * sin((theta * CV_PI) / 180);
+				if (ro >= 0 && ro <= diag)
+				{
+					Hough.at<int>(theta, ro)++;
+					if (Hough.at<int>(theta, ro) > maxHough)
+						maxHough = Hough.at<int>(theta, ro);
+				}
+		}
+	}
+
+	for (int ro = 0; ro <= diag; ro++)
+	{
+		for (int theta = 0; theta < 360; theta++)
+		{
+			int localmax = 0;
+			for (int i = ro - 1; i <= ro + 1; i++)
+			{
+				if (i > 0 && i <= diag)
+				{
+					for (int j = theta - 1; j <= theta + 1; j++)
+					{
+						if (j > 0 && j < 360)
+						{
+							if (Hough.at<int>(j, i) > localmax)
+							{
+								localmax = Hough.at<int>(j, i);
+							}
+						}
+					}
+				}
+			}
+
+			if (Hough.at<int>(theta, ro) == localmax)
+			{
+				peak p;
+				p.ro = ro;
+				p.theta = theta;
+				p.hval = localmax;
+				peaks.push_back(p);
+			}
+		}
+	}
+
+	sort(peaks.begin(), peaks.end(), desc);
+
+	for (int i = 0; i < 15; i++)
+	{
+		int x, y;
+		x = 0;
+		y = peaks[i].ro / sin(peaks[i].theta * CV_PI / 180);
+		Point P1(x, y);
+		x = cols;
+		y = (peaks[i].ro - x * cos(peaks[i].theta  * CV_PI / 180)) / sin(peaks[i].theta  * CV_PI / 180);
+		Point P2(x, y);
+		line(colorImg, P1, P2, Scalar(0, 0, 255));
+	}
+
+	Hough.convertTo(houghImg, CV_8UC1, 255.f / maxHough);
+	imshow("HoughCurves", houghImg);
+	imshow("Hough", colorImg);
+	waitKey();
+}
+
 int main()
 {
 	int op;
@@ -649,6 +759,7 @@ int main()
 		printf(" 9 - Mouse callback demo\n");
 		printf(" 10 - Least Mean Squares\n");
 		printf(" 11 - RANSAC line\n");
+		printf(" 12 - Hough Transform\n");
 		printf(" 0 - Exit\n\n");
 		printf("Option: ");
 		scanf("%d",&op);
@@ -687,6 +798,9 @@ int main()
 				break;
 			case 11:
 				ransac(10, 0.99, 0.8, 2);
+				break;
+			case 12:
+				hough();
 				break;
 			default:
 				break;
