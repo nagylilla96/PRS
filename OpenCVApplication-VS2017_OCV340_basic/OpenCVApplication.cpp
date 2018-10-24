@@ -740,6 +740,87 @@ void hough()
 	waitKey();
 }
 
+void distanceT(int wHV, int wD)
+{
+	std::vector<Point> points;
+	char fname[MAX_PATH], fname0[MAX_PATH];
+	int rows, cols, n = 0, sum = 0;
+
+	openFileDlg(fname0);
+	openFileDlg(fname);
+
+	Mat src = imread(fname0, CV_LOAD_IMAGE_GRAYSCALE);
+	Mat img = imread(fname, CV_LOAD_IMAGE_GRAYSCALE);
+	Mat dt = img.clone();
+
+	rows = img.rows;
+	cols = img.cols;
+
+	for (int i = 0; i < rows; i++)
+	{
+		for (int j = 0; j < cols; j++)
+		{
+			if (j - 1 >= 0 && i - 1 >= 0) {
+				if (dt.at<uchar>(i - 1, j - 1) + wD < dt.at<uchar>(i, j))
+					dt.at<uchar>(i, j) = dt.at<uchar>(i - 1, j - 1) + wD;
+			}
+			if (j - 1 >= 0) {
+				if (dt.at<uchar>(i, j - 1) + wHV < dt.at<uchar>(i, j))
+					dt.at<uchar>(i, j) = dt.at<uchar>(i, j - 1) + wHV;
+			}
+			if (i - 1 >= 0 && j + 1 < cols){
+				if (dt.at<uchar>(i - 1, j + 1) + wD < dt.at<uchar>(i, j))
+					dt.at<uchar>(i, j) = dt.at<uchar>(i - 1, j + 1) + wD;
+			}
+			if (i - 1 >= 0) {
+				if (dt.at<uchar>(i - 1, j) + wHV < dt.at<uchar>(i, j))
+					dt.at<uchar>(i, j) = dt.at<uchar>(i - 1, j) + wHV;
+			}
+		}
+	}
+
+	for (int i = rows - 1; i >= 0; i--)
+	{
+		for (int j = cols - 1; j >= 0; j--)
+		{
+			if (i + 1 < rows && j + 1 < cols) {
+				if (dt.at<uchar>(i + 1, j + 1) + wD < dt.at<uchar>(i, j))
+					dt.at<uchar>(i, j) = dt.at<uchar>(i + 1, j + 1) + wD;
+			}
+			if (j + 1 < cols) {
+				if (dt.at<uchar>(i, j + 1) + wHV < dt.at<uchar>(i, j))
+					dt.at<uchar>(i, j) = dt.at<uchar>(i, j + 1) + wHV;
+			}
+			if (i + 1 < rows && j - 1 >= 0) {
+				if (dt.at<uchar>(i + 1, j - 1) + wD < dt.at<uchar>(i, j))
+					dt.at<uchar>(i, j) = dt.at<uchar>(i + 1, j - 1) + wD;
+			}
+			if (i + 1 < rows) {
+				if (dt.at<uchar>(i + 1, j) + wHV < dt.at<uchar>(i, j))
+					dt.at<uchar>(i, j) = dt.at<uchar>(i + 1, j) + wHV;
+			}
+		}
+	}
+
+	for (int i = 0; i < rows; i++)
+	{
+		for (int j = 0; j < cols; j++)
+		{
+			if (src.at<uchar>(i, j) == 0)
+			{
+				sum += dt.at<uchar>(i, j);
+				n++;
+			}
+		}
+	}
+
+	printf("Mean = %f\n", (float) sum / n);
+
+	imshow("DT", dt);
+	waitKey();
+
+}
+
 int main()
 {
 	int op;
@@ -760,6 +841,7 @@ int main()
 		printf(" 10 - Least Mean Squares\n");
 		printf(" 11 - RANSAC line\n");
 		printf(" 12 - Hough Transform\n");
+		printf(" 13 - Distance Transform and Pattern Matching\n");
 		printf(" 0 - Exit\n\n");
 		printf("Option: ");
 		scanf("%d",&op);
@@ -801,6 +883,9 @@ int main()
 				break;
 			case 12:
 				hough();
+				break;
+			case 13:
+				distanceT(5, 7);
 				break;
 			default:
 				break;
