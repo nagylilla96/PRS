@@ -5,12 +5,23 @@
 #include "common.h"
 #include <iostream>
 #include <vector>
+#include <random>
 
 struct peak {
 	int theta, ro, hval;
 	bool operator < (const peak& o) const {
 		return hval > o.hval;
 	}
+};
+
+struct clustPoint {
+	Point point;
+	int cluster;
+	int prevCluster;
+};
+
+struct meanCalc {
+	int sumX, sumY, n;
 };
 
 void testOpenImage()
@@ -818,7 +829,227 @@ void distanceT(int wHV, int wD)
 
 	imshow("DT", dt);
 	waitKey();
+}
 
+void dataAnalysis(int fi1, int fi2, int fj1, int fj2)
+{
+	char folder[256] = "images_faces";
+	char fname[256];
+	FILE *f, *g;
+	int const N = 361;
+	int const p = 400;
+	double means[361] = { 0 };
+	double deviations[361] = { 0 };
+	int features[p][N] = { 0 };
+	Mat cov = Mat::zeros(N, N, CV_64FC1);
+	Mat corr = Mat::zeros(N, N, CV_64FC1);
+	Mat img = Mat::zeros(256, 256, CV_8UC1);
+
+	for (int i = 1; i <= p; i++) {
+		sprintf(fname, "%s/face%05d.bmp", folder, i);
+		Mat img = imread(fname, CV_LOAD_IMAGE_GRAYSCALE);
+		printf("Reading %s\n", fname);
+		for (int j = 0; j < 19; j++)
+		{
+			for (int k = 0; k < 19; k++)
+			{
+				features[i - 1][j * 19 + k] = img.at<uchar>(j, k);
+				means[j * 19 + k] += img.at<uchar>(j, k);
+			}
+		}
+	}
+
+	for (int i = 0; i < 361; i++)
+	{
+		means[i] *= 1.0 / p;
+	}
+
+	for (int i = 0; i < 361; i++)
+	{
+		double sum = 0.0;
+		for (int k = 0; k < p; k++)
+		{
+			sum += (features[k][i] - means[i]) * (features[k][i] - means[i]);
+		}
+		deviations[i] = sqrt(sum * 1.0 / p);
+	}
+
+	f = fopen("cov.csv", "w");
+	if (f == NULL)
+	{
+		printf("File not found\n");
+		return;
+	}
+
+	for (int i = 0; i < N; i++)
+	{
+		for (int j = 0; j < N; j++)
+		{
+			double sum = 0.0;
+			double devsum = 0.0;
+			for (int k = 0; k < p; k++)
+			{
+				sum += (features[k][i] - means[i]) * (features[k][j] - means[j]);
+			}
+			cov.at<double>(i, j) = sum * 1.0 / p;
+			fprintf(f, "%f, ", cov.at<double>(i, j));
+		}
+		fprintf(f, "\n");
+	}
+	fclose(f);
+
+	g = fopen("corr.csv", "w");
+	if (g == NULL)
+	{
+		printf("File not found\n");
+		return;
+	}
+
+	for (int i = 0; i < N; i++)
+	{
+		for (int j = 0; j < N; j++)
+		{
+			corr.at<double>(i, j) = cov.at<double>(i, j) / (deviations[i] * deviations[j]);
+			fprintf(g, "%f, ", corr.at<double>(i, j));
+		}
+		fprintf(g, "\n");
+	}
+	fclose(g);
+
+	int fi = fi1 * 19 + fj1;
+	int fj = fi2 * 19 + fj2;
+
+	for (int k = 0; k < p; k++)
+	{
+		img.at<uchar>(features[k][fi], features[k][fj]) = 255;
+	}
+
+	imshow("Img", img);
+	printf("Correlation: %f\n", corr.at<double>(fj, fi));
+
+	waitKey();
+}
+
+void kmeans(int K)
+{
+	char fname[MAX_PATH];
+	Point* means = new Point[K];
+	std::vector<clustPoint> points;
+	int rows, cols, n;
+
+	srand(time(NULL));
+
+	openFileDlg(fname);
+
+	Mat src = imread(fname, CV_LOAD_IMAGE_GRAYSCALE);
+	rows = src.rows;
+	cols = src.cols;
+
+	for (int i = 0; i < cols; i++)
+	{
+		for (int j = 0; j < rows; j++)
+		{
+			if (src.at<uchar>(i, j) == 0) {
+				clustPoint cp;
+				cp.point = Point(i, j);
+				cp.cluster = -1;
+				cp.prevCluster = -1;
+				points.push_back(cp);
+			}
+		}
+	}
+
+	n = points.size();
+
+	std::cout << "n = " << n << std::endl;
+
+	// Initialize clusters
+
+	for (int i = 0; i < K; i++)
+	{
+		means[i] = points.at(rand() % n).point;
+	}
+
+	bool nochange = true;
+
+	while (nochange) {
+		// Assignment
+
+		for (int i = 0; i < n; i++)
+		{
+			double dist = 100000;
+			for (int j = 0; j < K; j++)
+			{
+				double hdist = (means[j].x - points.at(i).point.x) * (means[j].x - points.at(i).point.x) +
+					(means[j].y - points.at(i).point.y) * (means[j].y - points.at(i).point.y);
+					if (hdist  < dist)
+				{
+					points.at(i).prevCluster = points.at(i).cluster;
+					points.at(i).cluster = j;
+					dist = hdist;
+				}
+
+				if (points.at(i).prevCluster != points.at(i).cluster) nochange = false;
+			}
+		}
+
+		//if (nochange) break;
+
+		// Update centers
+
+		meanCalc* calcs = new meanCalc[K];
+		for (int i = 0; i < K; i++) {
+			calcs[i].n = 0;
+			calcs[i].sumX = 0;
+			calcs[i].sumY = 0;
+		}
+
+		for (int j = 0; j < n; j++)
+		{
+			calcs[points.at(j).cluster].sumX += points.at(j).point.x;
+			calcs[points.at(j).cluster].sumY += points.at(j).point.y;
+			calcs[points.at(j).cluster].n++;
+		}
+
+		for (int i = 0; i < K; i++) {
+			means[i] = Point(calcs[i].sumX / n, calcs[i].sumY / n);
+		}
+	}
+
+	Vec3b* colors = new Vec3b[K];
+
+	for (int i = 0; i < K; i++) {
+		colors[i] = { (uchar) rand(), (uchar)rand(), (uchar)rand() };
+	}
+
+	Mat img = Mat::zeros(rows, cols, CV_8UC3);
+	Mat imgV = Mat::zeros(rows, cols, CV_8UC3);
+
+	for (int i = 0; i < n; i++)
+	{
+		img.at<Vec3b>(points.at(i).point.x, points.at(i).point.y) = colors[points.at(i).cluster];
+	}
+
+	for (int i = 0; i < rows; i++) {
+		for (int j = 0; j < cols; j++) {
+			double dist = 100000000;
+			int ind;
+			for (int k = 0; k < K; k++) {
+				double hdist = (means[k].x - i) * (means[k].x - i) +
+					(means[k].y - j) * (means[k].y - j);
+				if (hdist < dist)
+				{
+					dist = hdist;
+					ind = k;
+				}
+			}
+			imgV.at<Vec3b>(i, j) = colors[ind];
+		}
+	}
+
+	imshow("Img", img);
+	imshow("ImgV", imgV);
+	waitKey();
 }
 
 int main()
@@ -842,6 +1073,8 @@ int main()
 		printf(" 11 - RANSAC line\n");
 		printf(" 12 - Hough Transform\n");
 		printf(" 13 - Distance Transform and Pattern Matching\n");
+		printf(" 14 - Statistical Data Analysis\n");
+		printf(" 15 - K-means clustering\n");
 		printf(" 0 - Exit\n\n");
 		printf("Option: ");
 		scanf("%d",&op);
@@ -886,6 +1119,12 @@ int main()
 				break;
 			case 13:
 				distanceT(5, 7);
+				break;
+			case 14:
+				dataAnalysis(5, 5, 4, 14);
+				break;
+			case 15:
+				kmeans(3);
 				break;
 			default:
 				break;
