@@ -972,28 +972,27 @@ void kmeans(int K)
 
 	bool nochange = true;
 
-	while (nochange) {
-		// Assignment
+	// Assignment
 
-		for (int i = 0; i < n; i++)
+	for (int i = 0; i < n; i++)
+	{
+		double dist = 100000;
+		for (int j = 0; j < K; j++)
 		{
-			double dist = 100000;
-			for (int j = 0; j < K; j++)
+			double hdist = (means[j].x - points.at(i).point.x) * (means[j].x - points.at(i).point.x) +
+				(means[j].y - points.at(i).point.y) * (means[j].y - points.at(i).point.y);
+			if (hdist < dist)
 			{
-				double hdist = (means[j].x - points.at(i).point.x) * (means[j].x - points.at(i).point.x) +
-					(means[j].y - points.at(i).point.y) * (means[j].y - points.at(i).point.y);
-					if (hdist  < dist)
-				{
-					points.at(i).prevCluster = points.at(i).cluster;
-					points.at(i).cluster = j;
-					dist = hdist;
-				}
-
-				if (points.at(i).prevCluster != points.at(i).cluster) nochange = false;
+				points.at(i).prevCluster = points.at(i).cluster;
+				points.at(i).cluster = j;
+				dist = hdist;
 			}
-		}
 
-		//if (nochange) break;
+			if (points.at(i).prevCluster != points.at(i).cluster) nochange = false;
+		}
+	}
+
+	while (nochange) {
 
 		// Update centers
 
@@ -1014,6 +1013,26 @@ void kmeans(int K)
 		for (int i = 0; i < K; i++) {
 			means[i] = Point(calcs[i].sumX / n, calcs[i].sumY / n);
 		}
+
+		// Assignment
+
+		for (int i = 0; i < n; i++)
+		{
+			double dist = 100000;
+			for (int j = 0; j < K; j++)
+			{
+				double hdist = (means[j].x - points.at(i).point.x) * (means[j].x - points.at(i).point.x) +
+					(means[j].y - points.at(i).point.y) * (means[j].y - points.at(i).point.y);
+				if (hdist < dist)
+				{
+					points.at(i).prevCluster = points.at(i).cluster;
+					points.at(i).cluster = j;
+					dist = hdist;
+				}
+
+				if (points.at(i).prevCluster != points.at(i).cluster) nochange = false;
+			}
+		}
 	}
 
 	Vec3b* colors = new Vec3b[K];
@@ -1033,7 +1052,7 @@ void kmeans(int K)
 	for (int i = 0; i < rows; i++) {
 		for (int j = 0; j < cols; j++) {
 			double dist = 100000000;
-			int ind;
+			int ind = 0;
 			for (int k = 0; k < K; k++) {
 				double hdist = (means[k].x - i) * (means[k].x - i) +
 					(means[k].y - j) * (means[k].y - j);

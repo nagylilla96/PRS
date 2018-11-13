@@ -1,4 +1,23 @@
-﻿  OpenCVApplication.vcxproj -> C:\Users\Lilla\Documents\Visual Studio 2015\Projects\PRS\OpenCVApplication-VS2017_OCV340_basic\x64\Debug\OpenCVApplication.exe
+﻿  OpenCVApplication.cpp
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(439): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(440): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(441): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(474): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(493): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(494): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(495): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(496): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(583): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(628): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(662): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(673): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(691): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(740): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(743): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(940): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(962): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(1134): warning C4305: 'argument': truncation from 'double' to 'float'
+  OpenCVApplication.vcxproj -> C:\Users\Lilla\Documents\Visual Studio 2015\Projects\PRS\OpenCVApplication-VS2017_OCV340_basic\x64\Debug\OpenCVApplication.exe
   OpenCVApplication.vcxproj -> C:\Users\Lilla\Documents\Visual Studio 2015\Projects\PRS\OpenCVApplication-VS2017_OCV340_basic\x64\Debug\OpenCVApplication.pdb (Full PDB)
   OpenCV\dll\Debug\opencv_ffmpeg340_64.dll
   OpenCV\dll\Debug\opencv_world340d.dll
