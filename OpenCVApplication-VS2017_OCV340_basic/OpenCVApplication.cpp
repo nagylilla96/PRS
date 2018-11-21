@@ -27,11 +27,11 @@ struct meanCalc {
 void testOpenImage()
 {
 	char fname[MAX_PATH];
-	while(openFileDlg(fname))
+	while (openFileDlg(fname))
 	{
 		Mat src;
 		src = imread(fname);
-		imshow("image",src);
+		imshow("image", src);
 		waitKey();
 	}
 }
@@ -39,16 +39,16 @@ void testOpenImage()
 void testOpenImagesFld()
 {
 	char folderName[MAX_PATH];
-	if (openFolderDlg(folderName)==0)
+	if (openFolderDlg(folderName) == 0)
 		return;
 	char fname[MAX_PATH];
-	FileGetter fg(folderName,"bmp");
-	while(fg.getNextAbsFile(fname))
+	FileGetter fg(folderName, "bmp");
+	while (fg.getNextAbsFile(fname))
 	{
 		Mat src;
 		src = imread(fname);
-		imshow(fg.getFoundFileName(),src);
-		if (waitKey()==27) //ESC pressed
+		imshow(fg.getFoundFileName(), src);
+		if (waitKey() == 27) //ESC pressed
 			break;
 	}
 }
@@ -91,22 +91,22 @@ void testImageOpenAndSave()
 void testNegativeImage()
 {
 	char fname[MAX_PATH];
-	while(openFileDlg(fname))
+	while (openFileDlg(fname))
 	{
 		double t = (double)getTickCount(); // Get the current time [s]
-		Mat src = imread(fname,CV_LOAD_IMAGE_GRAYSCALE);
+		Mat src = imread(fname, CV_LOAD_IMAGE_GRAYSCALE);
 		int height = src.rows;
 		int width = src.cols;
-		Mat dst = Mat(height,width,CV_8UC1);
+		Mat dst = Mat(height, width, CV_8UC1);
 		// Asa se acceseaaza pixelii individuali pt. o imagine cu 8 biti/pixel
 		// Varianta ineficienta (lenta)
-		for (int i=0; i<height; i++)
+		for (int i = 0; i < height; i++)
 		{
-			for (int j=0; j<width; j++)
+			for (int j = 0; j < width; j++)
 			{
-				uchar val = src.at<uchar>(i,j);
+				uchar val = src.at<uchar>(i, j);
 				uchar neg = 255 - val;
-				dst.at<uchar>(i,j) = neg;
+				dst.at<uchar>(i, j) = neg;
 			}
 		}
 
@@ -115,8 +115,8 @@ void testNegativeImage()
 		// Print (in the console window) the processing time in [ms]
 		printf("Time = %.3f [ms]\n", t * 1000);
 
-		imshow("input image",src);
-		imshow("negative image",dst);
+		imshow("input image", src);
+		imshow("negative image", dst);
 		waitKey();
 	}
 }
@@ -136,8 +136,8 @@ void testParcurgereSimplaDiblookStyle()
 		// the fastest approach using the “diblook style”
 		uchar *lpSrc = src.data;
 		uchar *lpDst = dst.data;
-		int w = (int) src.step; // no dword alignment is done !!!
-		for (int i = 0; i<height; i++)
+		int w = (int)src.step; // no dword alignment is done !!!
+		for (int i = 0; i < height; i++)
 			for (int j = 0; j < width; j++) {
 				uchar val = lpSrc[i*w + j];
 				lpDst[i*w + j] = 255 - val;
@@ -148,8 +148,8 @@ void testParcurgereSimplaDiblookStyle()
 		// Print (in the console window) the processing time in [ms]
 		printf("Time = %.3f [ms]\n", t * 1000);
 
-		imshow("input image",src);
-		imshow("negative image",dst);
+		imshow("input image", src);
+		imshow("negative image", dst);
 		waitKey();
 	}
 }
@@ -157,30 +157,30 @@ void testParcurgereSimplaDiblookStyle()
 void testColor2Gray()
 {
 	char fname[MAX_PATH];
-	while(openFileDlg(fname))
+	while (openFileDlg(fname))
 	{
 		Mat src = imread(fname);
 
 		int height = src.rows;
 		int width = src.cols;
 
-		Mat dst = Mat(height,width,CV_8UC1);
+		Mat dst = Mat(height, width, CV_8UC1);
 
 		// Asa se acceseaaza pixelii individuali pt. o imagine RGB 24 biti/pixel
 		// Varianta ineficienta (lenta)
-		for (int i=0; i<height; i++)
+		for (int i = 0; i < height; i++)
 		{
-			for (int j=0; j<width; j++)
+			for (int j = 0; j < width; j++)
 			{
-				Vec3b v3 = src.at<Vec3b>(i,j);
+				Vec3b v3 = src.at<Vec3b>(i, j);
 				uchar b = v3[0];
 				uchar g = v3[1];
 				uchar r = v3[2];
-				dst.at<uchar>(i,j) = (r+g+b)/3;
+				dst.at<uchar>(i, j) = (r + g + b) / 3;
 			}
 		}
-		imshow("input image",src);
-		imshow("gray image",dst);
+		imshow("input image", src);
+		imshow("gray image", dst);
 		waitKey();
 	}
 }
@@ -210,9 +210,9 @@ void testBGR2HSV()
 		// definire pointer la matricea (24 biti/pixeli) a imaginii HSV
 		uchar* hsvDataPtr = hsvImg.data;
 
-		for (int i = 0; i<height; i++)
+		for (int i = 0; i < height; i++)
 		{
-			for (int j = 0; j<width; j++)
+			for (int j = 0; j < width; j++)
 			{
 				int hi = i*width * 3 + j * 3;
 				int gi = i*width + j;
@@ -235,18 +235,18 @@ void testBGR2HSV()
 void testResize()
 {
 	char fname[MAX_PATH];
-	while(openFileDlg(fname))
+	while (openFileDlg(fname))
 	{
 		Mat src;
 		src = imread(fname);
-		Mat dst1,dst2;
+		Mat dst1, dst2;
 		//without interpolation
-		resizeImg(src,dst1,320,false);
+		resizeImg(src, dst1, 320, false);
 		//with interpolation
-		resizeImg(src,dst2,320,true);
-		imshow("input image",src);
-		imshow("resized image (without interpolation)",dst1);
-		imshow("resized image (with interpolation)",dst2);
+		resizeImg(src, dst2, 320, true);
+		imshow("input image", src);
+		imshow("resized image (without interpolation)", dst1);
+		imshow("resized image (with interpolation)", dst2);
 		waitKey();
 	}
 }
@@ -254,17 +254,17 @@ void testResize()
 void testCanny()
 {
 	char fname[MAX_PATH];
-	while(openFileDlg(fname))
+	while (openFileDlg(fname))
 	{
-		Mat src,dst,gauss;
-		src = imread(fname,CV_LOAD_IMAGE_GRAYSCALE);
+		Mat src, dst, gauss;
+		src = imread(fname, CV_LOAD_IMAGE_GRAYSCALE);
 		double k = 0.4;
 		int pH = 50;
-		int pL = (int) k*pH;
+		int pL = (int)k*pH;
 		GaussianBlur(src, gauss, Size(5, 5), 0.8, 0.8);
-		Canny(gauss,dst,pL,pH,3);
-		imshow("input image",src);
-		imshow("canny",dst);
+		Canny(gauss, dst, pL, pH, 3);
+		imshow("input image", src);
+		imshow("canny", dst);
 		waitKey();
 	}
 }
@@ -286,7 +286,7 @@ void testVideoSequence()
 	{
 		Mat grayFrame;
 		cvtColor(frame, grayFrame, CV_BGR2GRAY);
-		Canny(grayFrame,edges,40,100,3);
+		Canny(grayFrame, edges, 40, 100, 3);
 		imshow("source", frame);
 		imshow("gray", grayFrame);
 		imshow("edges", edges);
@@ -341,27 +341,27 @@ void testSnap()
 		++frameNum;
 		imshow(WIN_SRC, frame);
 
-c = cvWaitKey(10);  // waits a key press to advance to the next frame
-if (c == 27) {
-	// press ESC to exit
-	printf("ESC pressed - capture finished");
-	break;  //ESC pressed
-}
-if (c == 115) { //'s' pressed - snapp the image to a file
-	frameCount++;
-	fileName[0] = NULL;
-	sprintf(numberStr, "%d", frameCount);
-	strcat(fileName, "Images/A");
-	strcat(fileName, numberStr);
-	strcat(fileName, ".bmp");
-	bool bSuccess = imwrite(fileName, frame);
-	if (!bSuccess)
-	{
-		printf("Error writing the snapped image\n");
-	}
-	else
-		imshow(WIN_DST, frame);
-}
+		c = cvWaitKey(10);  // waits a key press to advance to the next frame
+		if (c == 27) {
+			// press ESC to exit
+			printf("ESC pressed - capture finished");
+			break;  //ESC pressed
+		}
+		if (c == 115) { //'s' pressed - snapp the image to a file
+			frameCount++;
+			fileName[0] = NULL;
+			sprintf(numberStr, "%d", frameCount);
+			strcat(fileName, "Images/A");
+			strcat(fileName, numberStr);
+			strcat(fileName, ".bmp");
+			bool bSuccess = imwrite(fileName, frame);
+			if (!bSuccess)
+			{
+				printf("Error writing the snapped image\n");
+			}
+			else
+				imshow(WIN_DST, frame);
+		}
 	}
 
 }
@@ -448,8 +448,8 @@ void displayPoints(Mat img, std::vector<Point2f> points) {
 */
 float calculateO1(int n, float sumax, float sumay, float sumaxx, float sumaxy) {
 	float O1 = 0;
-	O1 = (float) (n * sumaxy - sumax * sumay);
-	O1 /= (float) (n * sumaxx - sumax * sumax);
+	O1 = (float)(n * sumaxy - sumax * sumay);
+	O1 /= (float)(n * sumaxx - sumax * sumax);
 	return O1;
 }
 
@@ -459,7 +459,7 @@ n - number of points
 */
 float calculateO0(int n, float O1, float sumax, float sumay) {
 	float O0 = 0;
-	O0 = (float) (sumay - O1 * sumax) / (float) n;
+	O0 = (float)(sumay - O1 * sumax) / (float)n;
 	return O0;
 }
 
@@ -469,8 +469,8 @@ n - number of points
 */
 float calculateBeta(int n, float sumax, float sumay, float sumaxx, float sumaxy, float sumayy_xx) {
 	float beta = 0, par1 = 0, par2 = 0;
-	par1 = (float) (2 * sumaxy - 2.0 * sumax * sumay / n);
-	par2 = sumayy_xx + sumax * sumax /  (float) n - sumay * sumay / (float) n;
+	par1 = (float)(2 * sumaxy - 2.0 * sumax * sumay / n);
+	par2 = sumayy_xx + sumax * sumax / (float)n - sumay * sumay / (float)n;
 	beta = -0.5 * atan2(par1, par2);
 	return beta;
 }
@@ -481,7 +481,7 @@ n - number of points
 */
 float calculateRo(int n, float beta, float sumax, float sumay) {
 	float ro = 0;
-	ro = (cos(beta) * sumax + sin(beta) * sumay) / (float) n;
+	ro = (cos(beta) * sumax + sin(beta) * sumay) / (float)n;
 	return ro;
 }
 
@@ -584,7 +584,7 @@ void ransac(int t, float p, float q, int s)
 
 	openFileDlg(fname);
 
-	Mat img = imread(fname,  CV_LOAD_IMAGE_GRAYSCALE);
+	Mat img = imread(fname, CV_LOAD_IMAGE_GRAYSCALE);
 
 	rows = img.rows;
 	cols = img.cols;
@@ -601,7 +601,7 @@ void ransac(int t, float p, float q, int s)
 		}
 	}
 
-	N = (float) log(1 - p) / log(1 - pow(q, s));
+	N = (float)log(1 - p) / log(1 - pow(q, s));
 	T = q * n;
 
 	for (int i = 0; i < N; i++)
@@ -625,7 +625,7 @@ void ransac(int t, float p, float q, int s)
 		for (int j = 0; j < n; j++)
 		{
 			float dist = 0;
-			dist = (float) abs(a * points[j].x + b * points[j].y + c) / sqrt(a * a + b * b);
+			dist = (float)abs(a * points[j].x + b * points[j].y + c) / sqrt(a * a + b * b);
 			if (dist <= t) Sk++;
 		}
 
@@ -688,13 +688,13 @@ void hough()
 	{
 		for (int theta = 0; theta < 360; theta++)
 		{
-				int ro = points[i].x * cos((theta * CV_PI) / 180) + points[i].y * sin((theta * CV_PI) / 180);
-				if (ro >= 0 && ro <= diag)
-				{
-					Hough.at<int>(theta, ro)++;
-					if (Hough.at<int>(theta, ro) > maxHough)
-						maxHough = Hough.at<int>(theta, ro);
-				}
+			int ro = points[i].x * cos((theta * CV_PI) / 180) + points[i].y * sin((theta * CV_PI) / 180);
+			if (ro >= 0 && ro <= diag)
+			{
+				Hough.at<int>(theta, ro)++;
+				if (Hough.at<int>(theta, ro) > maxHough)
+					maxHough = Hough.at<int>(theta, ro);
+			}
 		}
 	}
 
@@ -779,7 +779,7 @@ void distanceT(int wHV, int wD)
 				if (dt.at<uchar>(i, j - 1) + wHV < dt.at<uchar>(i, j))
 					dt.at<uchar>(i, j) = dt.at<uchar>(i, j - 1) + wHV;
 			}
-			if (i - 1 >= 0 && j + 1 < cols){
+			if (i - 1 >= 0 && j + 1 < cols) {
 				if (dt.at<uchar>(i - 1, j + 1) + wD < dt.at<uchar>(i, j))
 					dt.at<uchar>(i, j) = dt.at<uchar>(i - 1, j + 1) + wD;
 			}
@@ -825,7 +825,7 @@ void distanceT(int wHV, int wD)
 		}
 	}
 
-	printf("Mean = %f\n", (float) sum / n);
+	printf("Mean = %f\n", (float)sum / n);
 
 	imshow("DT", dt);
 	waitKey();
@@ -945,13 +945,13 @@ void kmeans(int K)
 	rows = src.rows;
 	cols = src.cols;
 
-	for (int i = 0; i < cols; i++)
+	for (int i = 0; i < rows; i++)
 	{
-		for (int j = 0; j < rows; j++)
+		for (int j = 0; j < cols; j++)
 		{
 			if (src.at<uchar>(i, j) == 0) {
 				clustPoint cp;
-				cp.point = Point(i, j);
+				cp.point = Point(j, i);
 				cp.cluster = -1;
 				cp.prevCluster = -1;
 				points.push_back(cp);
@@ -970,29 +970,29 @@ void kmeans(int K)
 		means[i] = points.at(rand() % n).point;
 	}
 
-	bool nochange = true;
+	bool change = true;
 
-	// Assignment
 
-	for (int i = 0; i < n; i++)
-	{
-		double dist = 100000;
-		for (int j = 0; j < K; j++)
+	while (change) {
+
+		// Assignment
+
+		for (int i = 0; i < n; i++)
 		{
-			double hdist = (means[j].x - points.at(i).point.x) * (means[j].x - points.at(i).point.x) +
-				(means[j].y - points.at(i).point.y) * (means[j].y - points.at(i).point.y);
-			if (hdist < dist)
+			double dist = 10000000;
+			for (int j = 0; j < K; j++)
 			{
-				points.at(i).prevCluster = points.at(i).cluster;
-				points.at(i).cluster = j;
-				dist = hdist;
+				double hdist = (means[j].x - points.at(i).point.x) * (means[j].x - points.at(i).point.x) +
+					(means[j].y - points.at(i).point.y) * (means[j].y - points.at(i).point.y);
+				if (hdist < dist)
+				{
+					points.at(i).prevCluster = points.at(i).cluster;
+					points.at(i).cluster = j;
+					dist = hdist;
+					if (points.at(i).prevCluster == points.at(i).cluster) change = false;
+				}
 			}
-
-			if (points.at(i).prevCluster != points.at(i).cluster) nochange = false;
 		}
-	}
-
-	while (nochange) {
 
 		// Update centers
 
@@ -1011,34 +1011,16 @@ void kmeans(int K)
 		}
 
 		for (int i = 0; i < K; i++) {
-			means[i] = Point(calcs[i].sumX / n, calcs[i].sumY / n);
+			means[i].x = calcs[i].sumX / n;
+			means[i].y = calcs[i].sumY / n;
 		}
-
-		// Assignment
-
-		for (int i = 0; i < n; i++)
-		{
-			double dist = 100000;
-			for (int j = 0; j < K; j++)
-			{
-				double hdist = (means[j].x - points.at(i).point.x) * (means[j].x - points.at(i).point.x) +
-					(means[j].y - points.at(i).point.y) * (means[j].y - points.at(i).point.y);
-				if (hdist < dist)
-				{
-					points.at(i).prevCluster = points.at(i).cluster;
-					points.at(i).cluster = j;
-					dist = hdist;
-				}
-
-				if (points.at(i).prevCluster != points.at(i).cluster) nochange = false;
-			}
-		}
+		delete[] calcs;
 	}
 
 	Vec3b* colors = new Vec3b[K];
 
 	for (int i = 0; i < K; i++) {
-		colors[i] = { (uchar) rand(), (uchar)rand(), (uchar)rand() };
+		colors[i] = { (uchar)rand(), (uchar)rand(), (uchar)rand() };
 	}
 
 	Mat img = Mat::zeros(rows, cols, CV_8UC3);
@@ -1071,6 +1053,146 @@ void kmeans(int K)
 	waitKey();
 }
 
+void pca(int K) {
+	char fname[MAX_PATH];
+	int n, d;
+	Mat Lambda, Q;
+	double mad = 0;
+	int rows, cols;
+
+	openFileDlg(fname);
+	FILE* f = fopen(fname, "r");
+
+	fscanf(f, "%d %d", &n, &d);
+
+	printf("n = %d\nd = %d\n", n, d);
+
+	Mat X(n, d, CV_64FC1);
+	Mat Xn(n, d, CV_64FC1);
+	Mat Qk(d, K, CV_64FC1);
+	Mat Xpca(n, K, CV_64FC1);
+	Mat Xkt(n, d, CV_64FC1);
+
+	double *means = new double[d];
+	for (int i = 0; i < d; i++)
+	{
+		means[i] = 0;
+	}
+
+	double *mins = new double[K];
+	double *maxs = new double[K];
+
+	for (int i = 0; i < K; i++)
+	{
+		mins[i] = 99999999;
+		maxs[i] = -99999999;
+	}
+
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < d; j++) {
+			fscanf(f, "%lf", &X.at<double>(i, j));
+		}
+	}
+
+	for (int i = 0; i < d; i++) {
+		double sum = 0;
+		for (int j = 0; j < n; j++) {
+			sum += X.at<double>(j, i);
+		}
+		means[i] = (double)sum / n;
+		printf("means[%d] = %lf\n", i, means[i]);
+	}
+
+	for (int i = 0; i < n; i++)
+	{
+		for (int j = 0; j < d; j++)
+		{
+			Xn.at<double>(i, j) = X.at<double>(i, j) - means[j];
+		}
+	}
+
+	Mat C = (Xn.t() * Xn) / (n - 1);
+	eigen(C, Lambda, Q);
+	Q = Q.t();
+
+	printf("Eigenvalues\n");
+	for (int i = 0; i < d; i++)
+	{
+		printf("%lf\n", Lambda.at<double>(i));
+	}
+
+	for (int i = 0; i < d; i++)
+	{
+		for (int j = 0; j < K; j++)
+		{
+			Qk.at<double>(i, j) = Q.at<double>(i, j);
+		}
+	}
+
+	Xpca = Xn * Qk;
+	Xkt = Xpca * Qk.t();
+
+	for (int i = 0; i < n; i++)
+	{
+		for (int j = 0; j < d; j++)
+		{
+			mad += abs(Xn.at<double>(i, j) - Xkt.at<double>(i, j));
+		}
+	}
+
+	mad /= (n * d);
+
+	printf("mad = %lf\n", mad);
+
+	for (int i = 0; i < K; i++)
+	{
+		for (int j = 0; j < n; j++)
+		{
+			if (Xpca.at<double>(j, i) < mins[i])
+			{
+				mins[i] = Xpca.at<double>(j, i);
+			}
+			if (Xpca.at<double>(j, i) > maxs[i])
+			{
+				maxs[i] = Xpca.at<double>(j, i);
+			}
+		}
+	}
+
+	for (int i = 0; i < K; i++)
+	{
+		printf("min[%d] = %lf, max[%d] = %lf\n", i, mins[i], i, maxs[i]);
+	}
+
+	for (int i = 0; i < n; i++)
+	{
+		for (int j = 0; j < K; j++)
+		{
+			Xpca.at<double>(i, j) -= mins[j];
+		}
+	}
+
+	rows = maxs[0] - mins[0] + 1;
+	cols = maxs[1] - mins[1] + 1;
+
+	int intmin = maxs[2] - mins[2] + 1;
+	int multiplier = 255 / intmin;
+
+	printf("rows: %d, cols: %d\n", rows, cols);
+
+	Mat img = Mat::zeros(rows, cols, CV_8UC1);
+
+	for (int i = 0; i < n; i++)
+	{
+		int intensity = Xpca.at<double>(i, 2) * intmin;
+		img.at<uchar>(Xpca.at<double>(i, 0), Xpca.at<double>(i, 1)) = intensity;
+	}
+
+	imshow("PCA", img);
+
+	waitKey();
+}
+
 int main()
 {
 	int op;
@@ -1094,61 +1216,64 @@ int main()
 		printf(" 13 - Distance Transform and Pattern Matching\n");
 		printf(" 14 - Statistical Data Analysis\n");
 		printf(" 15 - K-means clustering\n");
+		printf(" 16 - PCA\n");
 		printf(" 0 - Exit\n\n");
 		printf("Option: ");
-		scanf("%d",&op);
+		scanf("%d", &op);
 		switch (op)
 		{
-			case 1:
-				testOpenImage();
-				break;
-			case 2:
-				testOpenImagesFld();
-				break;
-			case 3:
-				testParcurgereSimplaDiblookStyle(); //diblook style
-				break;
-			case 4:
-				//testColor2Gray();
-				testBGR2HSV();
-				break;
-			case 5:
-				testResize();
-				break;
-			case 6:
-				testCanny();
-				break;
-			case 7:
-				testVideoSequence();
-				break;
-			case 8:
-				testSnap();
-				break;
-			case 9:
-				testMouseClick();
-				break;
-			case 10:
-				leastMeanSquares();
-				break;
-			case 11:
-				ransac(10, 0.99, 0.8, 2);
-				break;
-			case 12:
-				hough();
-				break;
-			case 13:
-				distanceT(5, 7);
-				break;
-			case 14:
-				dataAnalysis(5, 5, 4, 14);
-				break;
-			case 15:
-				kmeans(3);
-				break;
-			default:
-				break;
+		case 1:
+			testOpenImage();
+			break;
+		case 2:
+			testOpenImagesFld();
+			break;
+		case 3:
+			testParcurgereSimplaDiblookStyle(); //diblook style
+			break;
+		case 4:
+			//testColor2Gray();
+			testBGR2HSV();
+			break;
+		case 5:
+			testResize();
+			break;
+		case 6:
+			testCanny();
+			break;
+		case 7:
+			testVideoSequence();
+			break;
+		case 8:
+			testSnap();
+			break;
+		case 9:
+			testMouseClick();
+			break;
+		case 10:
+			leastMeanSquares();
+			break;
+		case 11:
+			ransac(10, 0.99, 0.8, 2);
+			break;
+		case 12:
+			hough();
+			break;
+		case 13:
+			distanceT(5, 7);
+			break;
+		case 14:
+			dataAnalysis(5, 5, 4, 14);
+			break;
+		case 15:
+			kmeans(3);
+			break;
+		case 16:
+			pca(3);
+			break;
+		default:
+			break;
 		}
-	}
-	while (op!=0);
+	} while (op != 0);
 	return 0;
 }
