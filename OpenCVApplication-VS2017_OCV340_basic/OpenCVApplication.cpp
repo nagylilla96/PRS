@@ -6,6 +6,10 @@
 #include <iostream>
 #include <vector>
 #include <random>
+#include <stdio.h>
+
+const int nrclasses = 6;
+char classes[nrclasses][10] = { "beach", "city", "desert", "forest", "landscape", "snow" };
 
 struct peak {
 	int theta, ro, hval;
@@ -23,6 +27,82 @@ struct clustPoint {
 struct meanCalc {
 	int sumX, sumY, n;
 };
+
+struct classDist {
+	float dist;
+	int ind;
+	bool operator < (const classDist &other) const {
+		return dist < other.dist;
+	}
+};
+
+int findBin(int value)
+{
+	if (value >= 0 && value < 32)
+	{
+		return 0;
+	}
+	if (value >= 32 && value < 64)
+	{
+		return 1;
+	}
+	if (value >= 64 && value < 96)
+	{
+		return 2;
+	}
+	if (value >= 96 && value < 128)
+	{
+		return 3;
+	}
+	if (value >= 128 && value < 160)
+	{
+		return 4;
+	}
+	if (value >= 160 && value < 192)
+	{
+		return 5;
+	}
+	if (value >= 192 && value < 224)
+	{
+		return 6;
+	}
+	if (value >= 224 && value <= 256)
+	{
+		return 7;
+	}
+	return -1;
+}
+
+double distance(float x, float y)
+{
+	return (x - y) * (x - y);
+}
+
+// BGR
+int* calcHist(Mat img, int nr_bins)
+{
+	int *hist = (int*)malloc(sizeof(int) * nr_bins * 3);
+	for (int i = 0; i < nr_bins * 3; i++)
+	{
+		hist[i] = 0;
+	}
+
+	for (int i = 0; i < img.rows; i++)
+	{
+		for (int j = 0; j < img.cols; j++)
+		{
+			Vec3b color = img.at<Vec3b>(i, j);
+			int blue = findBin(color[0]);
+			int green = findBin(color[1]);
+			int red = findBin(color[2]);
+			hist[blue] ++;
+			hist[green + nr_bins] ++;
+			hist[red + 2 * nr_bins] ++;
+		}
+	}
+
+	return hist;
+}
 
 void testOpenImage()
 {
@@ -1193,6 +1273,110 @@ void pca(int K) {
 	waitKey();
 }
 
+void knn(int M, int K) {
+	Mat X(1000, 3 * M, CV_32FC1);
+	Mat y(1000, 1, CV_8UC1);
+	Mat C(6, 6, CV_32SC1, Scalar(0));
+
+	int c = 0, fileNr = 0, rowX = 0;
+	char fname[MAX_PATH];
+
+	for (int c = 0; c < 6; c++) {
+		fileNr = 0;
+		while (1)
+		{
+			sprintf(fname, "images_KNN/train/%s/%06d.jpeg", classes[c], fileNr++);
+			Mat img = imread(fname, CV_LOAD_IMAGE_COLOR);
+			if (img.cols == 0) break;
+
+			int *hist = calcHist(img, M);
+
+			for (int d = 0; d < M * 3; d++)
+			{
+				X.at<float>(rowX, d) = hist[d];
+			}
+
+			y.at<uchar>(rowX) = c;
+			rowX++;
+		}
+	}
+
+
+
+	// CONFUSED!!!
+	for (int c = 0; c < 6; c++) {
+		fileNr = 0;
+		while (1)
+		{
+			std::vector<classDist> distances;
+			sprintf(fname, "images_KNN/test/%s/%06d.jpeg", classes[c], fileNr++);
+			Mat img = imread(fname, CV_LOAD_IMAGE_COLOR);
+			if (img.cols == 0) break;
+
+			int *hist = calcHist(img, M);
+			float sum = 0;
+
+			for (int i = 0; i < rowX; i++)
+			{
+				classDist clD;
+				sum = 0;
+				for (int d = 0; d < M * 3; d++)
+				{
+					float dist = distance(X.at<float>(i, d), hist[d]);
+					sum += dist;
+				}
+				sum = sqrt(sum);
+				clD.dist = sum;
+				clD.ind = y.at<uchar>(i);
+				distances.push_back(clD);
+			}
+
+			std::sort(distances.begin(), distances.end());
+
+			int thiscls[6] = { 0 };
+
+			for (int i = 0; i < K; i++)
+			{
+				thiscls[distances.at(i).ind] ++;
+			}
+
+			int max = 0;
+			int ind = 0;
+
+			for (int i = 0; i < 6; i++)
+			{
+				if (thiscls[i] > max)
+				{
+					max = thiscls[i];
+					ind = i;
+				}
+			}
+			C.at<int>(c, ind)++;
+		}
+		printf("c = %d\n", c);
+	}
+
+	int diag = 0, alll = 0;
+
+	for (int i = 0; i < 6; i++)
+	{
+		for (int j = 0; j < 6; j++)
+		{
+			if (i == j) diag+= C.at<int>(i, j);
+			alll+= C.at<int>(i, j);
+			printf("%d ", C.at<int>(i, j));
+		}
+		printf("\n");
+	}
+
+	printf("Accuracy: %f", (float)((float)diag / (float)alll));
+
+	getchar();
+	getchar();
+	//imshow("KNN", img);
+	waitKey();
+}
+
 int main()
 {
 	int op;
@@ -1217,6 +1401,7 @@ int main()
 		printf(" 14 - Statistical Data Analysis\n");
 		printf(" 15 - K-means clustering\n");
 		printf(" 16 - PCA\n");
+		printf(" 17 - KNN classifier\n");
 		printf(" 0 - Exit\n\n");
 		printf("Option: ");
 		scanf("%d", &op);
@@ -1270,6 +1455,9 @@ int main()
 			break;
 		case 16:
 			pca(3);
+			break;
+		case 17:
+			knn(8, 7);
 			break;
 		default:
 			break;
