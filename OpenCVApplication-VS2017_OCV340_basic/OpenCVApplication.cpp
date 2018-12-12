@@ -1394,14 +1394,14 @@ int main()
 		printf(" 7 - Edges in a video sequence\n");
 		printf(" 8 - Snap frame from live video\n");
 		printf(" 9 - Mouse callback demo\n");
-		printf(" 10 - Least Mean Squares\n");
-		printf(" 11 - RANSAC line\n");
-		printf(" 12 - Hough Transform\n");
-		printf(" 13 - Distance Transform and Pattern Matching\n");
-		printf(" 14 - Statistical Data Analysis\n");
-		printf(" 15 - K-means clustering\n");
-		printf(" 16 - PCA\n");
-		printf(" 17 - KNN classifier\n");
+		printf(" 10 - Least Mean Squares\n"); // Lab1
+		printf(" 11 - RANSAC line\n"); // Lab2
+		printf(" 12 - Hough Transform\n"); // Lab3
+		printf(" 13 - Distance Transform and Pattern Matching\n"); // Lab4
+		printf(" 14 - Statistical Data Analysis\n"); // Lab5
+		printf(" 15 - K-means clustering\n"); // Lab6
+		printf(" 16 - PCA\n"); // Lab7
+		printf(" 17 - KNN classifier\n"); // Lab8
 		printf(" 0 - Exit\n\n");
 		printf("Option: ");
 		scanf("%d", &op);
