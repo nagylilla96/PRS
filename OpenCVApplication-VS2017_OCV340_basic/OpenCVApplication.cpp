@@ -38,7 +38,8 @@ struct classDist {
 
 struct trainingPoint {
 	int clasa;
-	Point point;
+	int x;
+	int y;
 };
 
 struct adaPoint {
@@ -1531,7 +1532,7 @@ void onlinePercetron(float nu, std::vector<float> w0, float elimit, int max_iter
 	}
 }
 
-void perceptron()
+std::vector<trainingPoint> read(int *rows, int *cols, Mat *image)
 {
 	char fname[MAX_PATH];
 	std::vector<trainingPoint> points;
@@ -1541,7 +1542,10 @@ void perceptron()
 	FILE* f = fopen(fname, "r");
 
 	Mat img = imread(fname, CV_LOAD_IMAGE_COLOR);
-	if (img.cols == 0) return;
+	*image = img;
+	if (img.cols == 0) return points;
+	*rows = img.rows;
+	*cols = img.cols;
 	for (int i = 0; i < img.rows; i++)
 	{
 		for (int j = 0; j < img.cols; j++)
@@ -1551,7 +1555,8 @@ void perceptron()
 			{
 				trainingPoint tp;
 				tp.clasa = -1;
-				tp.point = Point(j, i);
+				tp.x = j;
+				tp.y = i;
 				points.push_back(tp);
 			}
 			else
@@ -1560,13 +1565,64 @@ void perceptron()
 				{
 					trainingPoint tp;
 					tp.clasa = 1;
-					tp.point = Point(j, i);
+					tp.x = j;
+					tp.y = i;
 					points.push_back(tp);
 				}
 			}
 		}
 	}
 	printf("Assigned blue and red points\n");
+
+	return points;
+}
+
+void drawLine(float w[], Mat img)
+{
+	Point p1;
+	p1.x = 0;
+	p1.y = -w[0] / w[2];
+
+	Point p2;
+	p2.x = img.cols;
+	p2.y = -(w[1] * img.cols + w[0]) / w[2];
+
+	line(img, p1, p2, Vec3b(0, 255, 0));
+	imshow("Image", img);
+}
+
+void perceptron(float nu, float Elimit, int max_iter)
+{
+	int rows, cols;
+	Mat img;
+	std::vector<trainingPoint> points = read(&rows, &cols, &img);
+	printf("Rows: %d, cols: %d\n", rows, cols);
+	int n = points.size();
+	float w[3] = { 0.1, 0.1, 0.1 };
+
+	for (int iter = 0; iter < max_iter; iter++)
+	{
+		float E = 0;
+		for (int i = 0; i < n; i++)
+		{
+			float z = w[0] + w[1] * points.at(i).x + w[2] * points.at(i).y;
+			if (z * points.at(i).clasa <= 0)
+			{
+				w[0] += nu * points.at(i).clasa;
+				w[1] += nu * points.at(i).x * points.at(i).clasa;
+				w[2] += nu * points.at(i).y * points.at(i).clasa;
+				E++;
+			}
+		}
+		E /= n;
+		if (E < Elimit)
+			break;
+	}
+
+	printf("w = [ %f, %f, %f ]\n", w[0], w[1], w[2]);
+
+	drawLine(w, img);
+	waitKey();
 }
 
 weaklearner findBestWeakLearner(std::vector<adaPoint> points, int rows, int cols, int n, int t)
@@ -1581,7 +1637,7 @@ weaklearner findBestWeakLearner(std::vector<adaPoint> points, int rows, int cols
 		else img_size = rows;
 		for (int threshold = 0; threshold < img_size; threshold++)
 		{
- 			for (int label = 0; label < 2; label++)
+			for (int label = 0; label < 2; label++)
 			{
 				double error = 0;
 				for (int i = 0; i < n; i++)
@@ -1815,7 +1871,7 @@ int main()
 			bayes();
 			break;
 		case 19:
-			perceptron();
+			perceptron(0.0001, 0.00001, 100000);
 			break;
 		case 20:
 			adaboost(6);
