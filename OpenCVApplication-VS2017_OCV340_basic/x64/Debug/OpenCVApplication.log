@@ -1,4 +1,42 @@
-﻿  OpenCVApplication.vcxproj -> C:\Users\Lilla\Documents\Visual Studio 2015\Projects\PRS\OpenCVApplication-VS2017_OCV340_basic\x64\Debug\OpenCVApplication.exe
+﻿  OpenCVApplication.cpp
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(562): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(563): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(564): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(597): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(616): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(617): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(618): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(619): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(706): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(751): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(785): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(796): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(814): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(863): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(866): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(1063): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(1085): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(1298): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(1299): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(1301): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(1310): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(1311): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(1339): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(1368): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(1368): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(1511): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(1579): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(1583): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(1595): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(1596): warning C4838: conversion from 'double' to 'float' requires a narrowing conversion
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(1596): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(1672): warning C4305: 'initializing': truncation from 'int' to 'float'
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(1717): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(1724): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(1783): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(1859): warning C4305: 'argument': truncation from 'double' to 'float'
+c:\users\lilla\documents\visual studio 2015\projects\prs\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(1883): warning C4305: 'argument': truncation from 'double' to 'float'
+  OpenCVApplication.vcxproj -> C:\Users\Lilla\Documents\Visual Studio 2015\Projects\PRS\OpenCVApplication-VS2017_OCV340_basic\x64\Debug\OpenCVApplication.exe
   OpenCVApplication.vcxproj -> C:\Users\Lilla\Documents\Visual Studio 2015\Projects\PRS\OpenCVApplication-VS2017_OCV340_basic\x64\Debug\OpenCVApplication.pdb (Full PDB)
   OpenCV\dll\Debug\opencv_ffmpeg340_64.dll
   OpenCV\dll\Debug\opencv_world340d.dll

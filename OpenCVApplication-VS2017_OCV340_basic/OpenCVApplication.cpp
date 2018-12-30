@@ -8,6 +8,8 @@
 #include <random>
 #include <stdio.h>
 
+#define MAXSZ 1000
+
 const int nrclasses = 6;
 char classes[nrclasses][10] = { "beach", "city", "desert", "forest", "landscape", "snow" };
 
@@ -40,6 +42,41 @@ struct trainingPoint {
 	int clasa;
 	int x;
 	int y;
+};
+
+struct adaPoint {
+	int X[2];
+	int Y;
+};
+
+struct weaklearner {
+	int feature_i;
+	int threshold;
+	int class_label;
+	float error;
+	int classify(int X[2])
+	{
+		if (X[feature_i] < threshold)
+			return class_label;
+		return -class_label;
+	}
+};
+
+struct classifier {
+	int T;
+	std::vector<float> alphas;
+	std::vector<weaklearner> hs;
+	int classify(int X[2])
+	{
+		double sum = 0;
+		for (int i = 0; i < T; i++)
+		{
+			sum += alphas.at(i) * hs.at(i).classify(X);
+		}
+		if (sum > 0)
+			return 1;
+		return -1;
+	}
 };
 
 int findBin(int value)
@@ -1583,9 +1620,175 @@ void perceptron(float nu, float Elimit, int max_iter)
 	waitKey();
 }
 
+std::vector<adaPoint> readAda(int *rows, int *cols, Mat *image)
+{
+	char fname[MAX_PATH];
+	int size;
+	std::vector<adaPoint> points;
+
+	openFileDlg(fname);
+	FILE* f = fopen(fname, "r");
+
+	Mat img = imread(fname, CV_LOAD_IMAGE_COLOR);
+	*image = img;
+	if (img.cols == 0) return points;;
+	*rows = img.rows;
+	*cols = img.cols;
+	size = img.rows * img.cols;
+
+	for (int i = 0; i < img.rows; i++)
+	{
+		for (int j = 0; j < img.cols; j++)
+		{
+			Vec3b color = img.at<Vec3b>(i, j);
+			if (color[0] == 0 && color[1] == 0 && color[2] == 255) // Red
+			{
+				adaPoint p;
+				p.X[0] = j;
+				p.X[1] = i;
+				p.Y = -1;
+				points.push_back(p);
+			}
+			else
+			{
+				if (color[0] == 255 && color[1] == 0 && color[2] == 0) // Blue
+				{
+					adaPoint p;
+					p.X[0] = j;
+					p.X[1] = i;
+					p.Y = 1;
+					points.push_back(p);
+				}
+			}
+		}
+	}
+	printf("Assigned blue and red points\n");
+	return points;
+}
+
+weaklearner findBestWL(std::vector<adaPoint> points, std::vector<float> weights, int cols, int rows)
+{
+	weaklearner bestWL;
+	float best_error = INT_MAX;
+	int labels[2] = { -1, 1 };
+	int size[2] = { cols, rows };
+
+	for (int j = 0; j < 2; j++)
+	{
+		for (int thr = 0; thr < size[j]; thr++)
+		{
+			for (int lbl = 0; lbl < 2; lbl++)
+			{
+				float error = 0;
+				int z;
+				for (int i = 0; i < points.size(); i++)
+				{
+					if (points.at(i).X[j] < thr) {
+						z = labels[lbl];
+					}
+					else {
+						z = -labels[lbl];
+					}
+					if (z * points.at(i).Y < 0) {
+						error += weights.at(i);
+					}
+				}
+				if (error < best_error) {
+					best_error = error;
+					bestWL.error = error;
+					bestWL.class_label = labels[lbl];
+					bestWL.feature_i = j;
+					bestWL.threshold = thr;
+				}
+			}
+		}
+	}
+	return bestWL;
+}
+
+classifier adaClass(int n, int T, std::vector<adaPoint> points, int rows, int cols)
+{
+	std::vector<float> weights;
+	classifier ada;
+	ada.T = T;
+
+	for (int i = 0; i < n; i++)
+	{
+		weights.push_back(1.0 / n);
+	}
+
+	for (int t = 0; t < T; t++)
+	{
+		printf("%d/%d\n", t, T);
+		weaklearner wl = findBestWL(points, weights, cols, rows);
+		float alpha = 0.5 * log((1 - wl.error) / wl.error);
+		ada.alphas.push_back(alpha);
+		ada.hs.push_back(wl);
+		float s = 0;
+		for (int i = 0; i < n; i++)
+		{
+			weights.at(i) *= exp(-alpha * points.at(i).Y * wl.classify(points.at(i).X));
+			s += weights.at(i);
+		}
+		for (int i = 0; i < n; i++)
+		{
+			weights.at(i) /= s;
+		}
+	}
+	return ada;
+}
+
+void colorBack(Mat img, classifier adaCls)
+{
+	int rows = img.rows;
+	int cols = img.cols;
+
+	for (int i = 0; i < rows; i++)
+	{
+		for (int j = 0; j < cols; j++)
+		{
+			int X[2] = { j, i };
+			if (adaCls.classify(X) == 1) {
+				Vec3b color = Vec3b(255, 255, 0);
+				img.at<Vec3b>(i, j) = color;
+			}
+			else {
+				Vec3b color = Vec3b(0, 255, 255);
+				img.at<Vec3b>(i, j) = color;
+			}
+		}
+	}
+}
+
+void colorPoints(Mat img, std::vector<adaPoint> points)
+{
+	for (auto const& p : points)
+	{
+		if (p.Y == 1)
+		{
+			img.at<Vec3b>(p.X[1], p.X[0]) = Vec3b(255, 0, 0);
+		}
+		else
+		{
+			img.at<Vec3b>(p.X[1], p.X[0]) = Vec3b(0, 0, 255);
+		}
+	}
+}
+
 void adaboost(int T)
 {
+	int rows, cols;
+	Mat img, X, Y;
+	std::vector<adaPoint> points = readAda(&rows, &cols, &img);
+	int n = points.size();
 
+	classifier adaCls = adaClass(n, T, points, rows, cols);
+
+	colorBack(img, adaCls);
+	colorPoints(img, points);
+
+	imshow("Image", img);
+	waitKey();
 }
 
 int main()
@@ -1680,7 +1883,7 @@ int main()
 			perceptron(0.0001, 0.00001, 100000);
 			break;
 		case 20:
-			adaboost(6);
+			adaboost(1000);
 			break;
 		default:
 			break;
